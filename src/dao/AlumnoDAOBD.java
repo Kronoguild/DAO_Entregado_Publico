@@ -52,10 +52,14 @@ public class AlumnoDAOBD extends DAO<Alumno, Integer> {
         //Actualizar
         sentencia
                 = "UPDATE alumnos\n"
-                + "(apyn, sexo, fechaNac, promedio, cantMatAprob, fechaIngr, estado)\n"
-                + "VALUES\n"
-                + "(?, ?, ?, ?, ?, ?, ?)\n"
-                + "WHERE dni = ?;\n";
+                + "SET apyn = ?,\n"
+                + "sexo = ?,\n"
+                + " fechaNac = ?,\n"
+                + " promedio = ?,\n"
+                + "cantMatAprob = ?,\n"
+                + "fechaIngr = ?,\n"
+                + "estado = ?\n"
+                + "WHERE dni = ?";
 
         pStmtActualizar = conexion.prepareStatement(sentencia);
     }
@@ -91,11 +95,11 @@ public class AlumnoDAOBD extends DAO<Alumno, Integer> {
 
         //Antes de realizar el proceso, reviso si existe el alumnos con ese dni
         if (!existe(numeroDni)) {
-            throw new DAOException("El alumnos a dar de baja no existe en la base de datos.");
+            throw new DAOException("El alumnos a actualizar no existe en la base de datos.");
         }
 
         try {
-            pStmtActualizar.setString(1, obj.getApyn());
+            pStmtActualizar.setString(1, String.valueOf(obj.getApyn()));
             pStmtActualizar.setString(2, String.valueOf(obj.getSexo()));
             pStmtActualizar.setDate(3, obj.getFechaNac().toDate());
             pStmtActualizar.setDouble(4, obj.getPromedio());
