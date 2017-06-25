@@ -230,6 +230,7 @@ public class AlumnoDAOTxt extends DAO<Alumno, Integer> {
     *
     * @returns Array con todos los registros <<habilitados>> del Archivo
      */
+    @Override
     public List<Alumno> getHabilitados() {
         String linea;
         List<Alumno> listaAlu = new ArrayList<>();//necesito el array
@@ -257,6 +258,8 @@ public class AlumnoDAOTxt extends DAO<Alumno, Integer> {
     *
     * @returns Array con todos los registros <<deshabilitados>> del Archivo
      */
+    
+    @Override
     public List<Alumno> getDeshabilitados() {
         String linea;
         List<Alumno> listaAlu = new ArrayList<>();//necesito el array

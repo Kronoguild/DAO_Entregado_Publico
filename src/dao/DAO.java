@@ -10,4 +10,6 @@ public abstract class DAO<T, U>
     public abstract T buscar(U id) throws DAOException;
     public abstract boolean existe(U id) throws DAOException;
     public abstract List<T> getTodos() throws DAOException;
+    public abstract List<T> getHabilitados() throws DAOException;
+    public abstract List<T> getDeshabilitados() throws DAOException;
 }
