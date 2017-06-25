@@ -23,11 +23,11 @@ public class AlumnoDAOBD extends DAO<Alumno, Integer> {
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(AlumnoDAOBD.class.getName()).log(Level.SEVERE, null, ex);
         }
-        conexion = DriverManager.getConnection("jdbc:mysql://localhost:3306/alumnos", "root", "root");
+        conexion = DriverManager.getConnection("jdbc:mysql://localhost:330/alumnos?verifyServerCertificate=false&useSSL=true", "root", "root");
 
         //Insertar
         String sentencia
-                = "INSERT INTO alumno\n"
+                = "INSERT INTO alumnos\n"
                 + "(dni, apyn, sexo, fechaNac, promedio, cantMatAprob, fechaIngr)\n"
                 + "VALUES\n"
                 + "(?, ?, ?, ?, ?, ?, ?);\n";
@@ -37,21 +37,21 @@ public class AlumnoDAOBD extends DAO<Alumno, Integer> {
         //Buscar
         sentencia
                 = "SELECT *\n"
-                + "FROM alumno\n"
+                + "FROM alumnos\n"
                 + "WHERE dni = ?\n";
 
         pStmtBuscar = conexion.prepareStatement(sentencia);
 
         //Eliminar (Baja fisica)
         sentencia
-                = "DELETE FROM alumno\n"
+                = "DELETE FROM alumnos\n"
                 + "WHERE dni = ?;\n";
 
         pStmtEliminar = conexion.prepareStatement(sentencia);
 
         //Actualizar
         sentencia
-                = "UPDATE alumno\n"
+                = "UPDATE alumnos\n"
                 + "(apyn, sexo, fechaNac, promedio, cantMatAprob, fechaIngr, estado)\n"
                 + "VALUES\n"
                 + "(?, ?, ?, ?, ?, ?, ?)\n"
@@ -64,9 +64,9 @@ public class AlumnoDAOBD extends DAO<Alumno, Integer> {
     public void insertar(Alumno alu) throws DAOException {
         Integer numeroDni = alu.getDni();
 
-        //Antes de realizar el proceso, reviso si existe el alumno con ese dni
+        //Antes de realizar el proceso, reviso si existe el alumnos con ese dni
         if (existe(numeroDni)) {
-            throw new DAOException("El alumno a insertar existe en la base de datos.");
+            throw new DAOException("El alumnos a insertar existe en la base de datos.");
         }
 
         try {
@@ -89,9 +89,9 @@ public class AlumnoDAOBD extends DAO<Alumno, Integer> {
     public void actualizar(Alumno obj) throws DAOException {
         Integer numeroDni = obj.getDni();
 
-        //Antes de realizar el proceso, reviso si existe el alumno con ese dni
+        //Antes de realizar el proceso, reviso si existe el alumnos con ese dni
         if (!existe(numeroDni)) {
-            throw new DAOException("El alumno a dar de baja no existe en la base de datos.");
+            throw new DAOException("El alumnos a dar de baja no existe en la base de datos.");
         }
 
         try {
@@ -116,9 +116,9 @@ public class AlumnoDAOBD extends DAO<Alumno, Integer> {
     public void eliminar(Alumno obj) throws DAOException {
         Integer numeroDni = obj.getDni();
 
-        //Antes de realizar el proceso, reviso si existe el alumno con ese dni
+        //Antes de realizar el proceso, reviso si existe el alumnos con ese dni
         if (!existe(numeroDni)) {
-            throw new DAOException("El alumno a eliminar no existe en la base de datos.");
+            throw new DAOException("El alumnos a eliminar no existe en la base de datos.");
         }
 
         try {
@@ -187,7 +187,7 @@ public class AlumnoDAOBD extends DAO<Alumno, Integer> {
         ResultSet rs;
         String sentencia
                 = "SELECT *\n"
-                + "FROM alumno;\n";
+                + "FROM alumnos;\n";
 
         try {
             statement = conexion.createStatement();
@@ -214,7 +214,7 @@ public class AlumnoDAOBD extends DAO<Alumno, Integer> {
         ResultSet rs;
         String sentencia
                 = "SELECT *\n"
-                + "FROM alumno\n"
+                + "FROM alumnos\n"
                 + "WHERE estado='A';\n";
 
         try {
@@ -242,7 +242,7 @@ public class AlumnoDAOBD extends DAO<Alumno, Integer> {
         ResultSet rs;
         String sentencia
                 = "SELECT *\n"
-                + "FROM alumno\n"
+                + "FROM alumnos\n"
                 + "WHERE estado='B';\n";
 
         try {
