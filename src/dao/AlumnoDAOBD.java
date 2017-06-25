@@ -72,6 +72,13 @@ public class AlumnoDAOBD extends DAO<Alumno, Integer> {
 
     @Override
     public void insertar(Alumno alu) throws DAOException {
+        Integer numeroDni = alu.getDni();
+
+        //Antes de realizar el proceso, reviso si existe el alumno con ese dni
+        if (!existe(numeroDni)) {
+            throw new DAOException("El alumno a dar de baja no existe en la base de datos.");
+        }
+
         try {
             pStmtInsertar.setInt(1, alu.getDni());
             pStmtInsertar.setString(2, alu.getApyn());
@@ -90,6 +97,13 @@ public class AlumnoDAOBD extends DAO<Alumno, Integer> {
 
     @Override
     public void actualizar(Alumno obj) throws DAOException {
+        Integer numeroDni = obj.getDni();
+
+        //Antes de realizar el proceso, reviso si existe el alumno con ese dni
+        if (!existe(numeroDni)) {
+            throw new DAOException("El alumno a dar de baja no existe en la base de datos.");
+        }
+
         try {
             pStmtActualizar.setString(1, obj.getApyn());
             pStmtActualizar.setString(2, String.valueOf(obj.getSexo()));
