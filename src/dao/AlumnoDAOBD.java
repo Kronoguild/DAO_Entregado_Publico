@@ -16,8 +16,14 @@ import persona.PersonaInvalidaException;
 
 public class AlumnoDAOBD extends DAO<Alumno, Integer> {
 
-    public AlumnoDAOBD() throws SQLException {
-        conexion = DriverManager.getConnection("jdbc:mysql://localhost:330/alumnos", "root", "root");
+    public AlumnoDAOBD() throws SQLException, InstantiationException, IllegalAccessException {
+        DriverManager.registerDriver(new com.mysql.jdbc.Driver ());
+        try {
+            Class.forName("com.mysql.jdbc.Driver").newInstance();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(AlumnoDAOBD.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        conexion = DriverManager.getConnection("jdbc:mysql://localhost:3306/alumnos", "root", "root");
 
         //Insertar
         String sentencia
@@ -36,22 +42,6 @@ public class AlumnoDAOBD extends DAO<Alumno, Integer> {
 
         pStmtBuscar = conexion.prepareStatement(sentencia);
 
-        //Baja logica
-        sentencia
-                = "UPDATE alumno\n"
-                + "SET estado = 'B'\n"
-                + "WHERE dni = ?;\n";
-
-        pStmtDarDeBaja = conexion.prepareStatement(sentencia);
-
-        //Alta
-        sentencia
-                = "UPDATE alumno\n"
-                + "SET estado = 'A'\n"
-                + "WHERE dni = ?;\n";
-
-        pStmtDarDeAlta = conexion.prepareStatement(sentencia);
-
         //Eliminar (Baja fisica)
         sentencia
                 = "DELETE FROM alumno\n"
@@ -62,9 +52,9 @@ public class AlumnoDAOBD extends DAO<Alumno, Integer> {
         //Actualizar
         sentencia
                 = "UPDATE alumno\n"
-                + "(apyn, sexo, fechaNac, promedio, cantMatAprob, fechaIngr)\n"
+                + "(apyn, sexo, fechaNac, promedio, cantMatAprob, fechaIngr, estado)\n"
                 + "VALUES\n"
-                + "(?, ?, ?, ?, ?, ?)\n"
+                + "(?, ?, ?, ?, ?, ?, ?)\n"
                 + "WHERE dni = ?;\n";
 
         pStmtActualizar = conexion.prepareStatement(sentencia);
@@ -75,8 +65,8 @@ public class AlumnoDAOBD extends DAO<Alumno, Integer> {
         Integer numeroDni = alu.getDni();
 
         //Antes de realizar el proceso, reviso si existe el alumno con ese dni
-        if (!existe(numeroDni)) {
-            throw new DAOException("El alumno a dar de baja no existe en la base de datos.");
+        if (existe(numeroDni)) {
+            throw new DAOException("El alumno a insertar existe en la base de datos.");
         }
 
         try {
@@ -111,7 +101,8 @@ public class AlumnoDAOBD extends DAO<Alumno, Integer> {
             pStmtActualizar.setDouble(4, obj.getPromedio());
             pStmtActualizar.setInt(5, obj.getCantMatAprob());
             pStmtActualizar.setDate(6, obj.getFechaIngr().toDate());
-            pStmtActualizar.setInt(7, obj.getDni());
+            pStmtActualizar.setString(7,String.valueOf(obj.getEstado()));
+            pStmtActualizar.setInt(8, obj.getDni());
 
             pStmtActualizar.executeUpdate();
         } catch (SQLException ex) {
@@ -123,41 +114,6 @@ public class AlumnoDAOBD extends DAO<Alumno, Integer> {
     //Baja logica!
     @Override
     public void eliminar(Alumno obj) throws DAOException {
-        Integer numeroDni = obj.getDni();
-
-        //Antes de realizar el proceso, reviso si existe el alumno con ese dni
-        if (!existe(numeroDni)) {
-            throw new DAOException("El alumno a dar de baja no existe en la base de datos.");
-        }
-
-        try {
-            pStmtDarDeBaja.setInt(1, numeroDni);
-            pStmtDarDeBaja.execute();
-        } catch (SQLException ex) {
-            Logger.getLogger(AlumnoDAOBD.class.getName()).log(Level.SEVERE, null, ex);
-            throw new DAOException("Dar de baja falló: " + ex.getMessage());
-        }
-    }
-
-    public void darDeAlta(Alumno obj) throws DAOException {
-        Integer numeroDni = obj.getDni();
-
-        //Antes de realizar el proceso, reviso si existe el alumno con ese dni
-        if (!existe(numeroDni)) {
-            throw new DAOException("El alumno a dar de alta no existe en la base de datos.");
-        }
-
-        try {
-            pStmtDarDeAlta.setInt(1, numeroDni);
-            pStmtDarDeAlta.execute();
-        } catch (SQLException ex) {
-            Logger.getLogger(AlumnoDAOBD.class.getName()).log(Level.SEVERE, null, ex);
-            throw new DAOException("Dar de alta falló: " + ex.getMessage());
-        }
-    }
-
-    //Eliminar (Baja FISICA)
-    public void eliminarBajaFisica(Alumno obj) throws DAOException {
         Integer numeroDni = obj.getDni();
 
         //Antes de realizar el proceso, reviso si existe el alumno con ese dni
@@ -231,7 +187,7 @@ public class AlumnoDAOBD extends DAO<Alumno, Integer> {
         ResultSet rs;
         String sentencia
                 = "SELECT *\n"
-                + "FROM alumno";
+                + "FROM alumno;\n";
 
         try {
             statement = conexion.createStatement();
@@ -258,8 +214,8 @@ public class AlumnoDAOBD extends DAO<Alumno, Integer> {
         ResultSet rs;
         String sentencia
                 = "SELECT *\n"
-                + "FROM alumno"
-                + "WHERE estado='A'\n";
+                + "FROM alumno\n"
+                + "WHERE estado='A';\n";
 
         try {
             statement = conexion.createStatement();
@@ -286,8 +242,8 @@ public class AlumnoDAOBD extends DAO<Alumno, Integer> {
         ResultSet rs;
         String sentencia
                 = "SELECT *\n"
-                + "FROM alumno"
-                + "WHERE estado='B'\n";
+                + "FROM alumno\n"
+                + "WHERE estado='B';\n";
 
         try {
             statement = conexion.createStatement();
@@ -324,8 +280,6 @@ public class AlumnoDAOBD extends DAO<Alumno, Integer> {
     private Connection conexion;
     private PreparedStatement pStmtInsertar;
     private PreparedStatement pStmtBuscar;
-    private PreparedStatement pStmtDarDeBaja;
-    private PreparedStatement pStmtDarDeAlta;
     private PreparedStatement pStmtEliminar;
     private PreparedStatement pStmtActualizar;
 
